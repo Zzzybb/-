@@ -1,0 +1,22 @@
+ll qpow(ll a,ll n)
+{
+	ll ans=1;
+	while(n)
+	{
+		if(n & 1)
+			ans = (ans * a) % p;
+		a = (a * a) % p;
+		n >>= 1;
+	}
+	return ans;
+}
+f[0]=g[0]=1;
+    for(int i = 1; i <= n; i++)
+    {
+        f[i] = f[i - 1] * i % p;
+        g[i] = g[i - 1] * qpow(i, p - 2) % p; 
+    }
+    int get(int n, int m)
+    {
+        return f[n] * g[m] * g[n - m] % p;
+    }

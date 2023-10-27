@@ -1,0 +1,88 @@
+#include <bits/stdc++.h>
+using namespace std;
+const int N = 1e5 + 5, M = 9e6;
+vector<int> G[N];
+struct {
+    int ls, rs, v, id;
+} T[M];
+int cnt, nn, R[N], ans[N];
+void pushup(int p) {
+    T[p].v = max(T[T[p].ls].v, T[T[p].rs].v);
+    T[p].id = T[T[p].ls].v >= T[T[p].rs].v ? T[T[p].ls].id : T[T[p].rs].id;
+}
+void add(int x, int d, int &p, int l = 1, int r = nn) {
+    if (!p) p = ++cnt;
+    if (l == r) return (void)(T[p].v += d, T[p].id = l);
+    int mid = l + r >> 1;
+    if (x <= mid)
+        add(x, d, T[p].ls, l, mid);
+    else
+        add(x, d, T[p].rs, mid + 1, r);
+    pushup(p);
+}
+int merge(int a, int b, int l = 1, int r = nn) {
+    if (!a || !b) return a + b;
+    if (l == r) return T[a].v += T[b].v, a;
+    int mid = l + r >> 1;
+    T[a].ls = merge(T[a].ls, T[b].ls, l, mid);
+    T[a].rs = merge(T[a].rs, T[b].rs, mid + 1, r);
+    pushup(a);
+    return a;
+}
+int fa[__lg(N) + 1][N], dep[N];
+//LCA的初始化
+void dfs(int u = 1, int f = 0) {
+    dep[u] = dep[f] + 1;
+    fa[0][u] = f;
+    for (int i = 1; i <= __lg(N); ++i)
+        fa[i][u] = fa[i - 1][fa[i - 1][u]];
+    for (auto v : G[u])
+        if (v != f)
+            dfs(v, u);
+}
+int lca(int u, int v) {
+    if (dep[u] > dep[v]) swap(u, v);
+    for (int i = __lg(dep[v]); i >= 0; --i)
+        if (dep[fa[i][v]] >= dep[u])
+            v = fa[i][v];
+    if (u == v) return u;
+    for (int i = __lg(dep[v]); i >= 0; --i)
+        if (fa[i][u] != fa[i][v])
+            u = fa[i][u], v = fa[i][v];
+    return fa[0][v];
+}
+//线段树合并
+void dfs2(int u = 1, int f = 0) {
+    for (auto v : G[u])
+        if (v != f) {
+            dfs2(v, u);
+            R[u] = merge(R[u], R[v]);
+        }
+    ans[u] = (T[R[u]].v ? T[R[u]].id : 0);
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    int n, m;
+    cin >> n >> m;
+    nn = 1e5 + 5;
+    for (int i = 1, u, v; i < n; ++i) {
+        cin >> u >> v;
+        G[u].push_back(v);
+        G[v].push_back(u);
+    }
+    dfs();
+    for (int i = 0, a, b, x; i < m; ++i) {
+        cin >> a >> b >> x;
+        int c = lca(a, b);
+        add(x, 1, R[a]);
+        add(x, 1, R[b]);
+        add(x, -1, R[c]);
+        add(x, -1, R[fa[0][c]]);
+    }
+    dfs2();
+    for (int i = 1; i <= n; ++i) {
+        cout << ans[i] << endl;
+    }
+    return 0;
+}

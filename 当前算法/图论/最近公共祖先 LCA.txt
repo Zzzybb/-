@@ -1,0 +1,77 @@
+
+#include<bits/stdc++.h>
+using namespace std;
+using ll = long long;
+#define endl '\n'
+const int N = 5e6 + 10;
+struct node{
+    int to, nex;
+}e[N<<1];
+int dep[N], fa[N][22], head[N], cnt;
+
+void add(int a, int b){
+    e[++cnt].to = b;
+    e[cnt].nex = head[a];
+    head[a] = cnt;
+}
+
+// dfs初始化fa 和dep
+void dfs(int now, int father){
+    dep[now] = dep[father] + 1;
+    fa[now][0] = father;
+    for(int i=1;(1<<i)<=dep[now];i++)
+        fa[now][i] = fa[fa[now][i-1]][i-1];
+    for(int i = head[now]; i; i = e[i].nex){
+        int v = e[i].to;
+        if(v == father) continue;
+        dfs(v, now);
+    }
+}
+
+int lca(int u, int v){
+    int depu = dep[u], depv = dep[v];
+    if(depu != depv){
+        if(depv > depu){
+            swap(u, v);
+            swap(depu, depv);
+        }
+        int d = depu - depv;
+        for(int i = 0; i <= 20; i++){
+            if((1<<i) & d) u = fa[u][i];
+        }
+    }
+    if(u == v) return u;
+    for(int i = 20; i >= 0; i--){
+        if(dep[fa[u][i]] <= 0) continue;
+        if(fa[u][i] == fa[v][i]) continue;
+        else{
+            u = fa[u][i];
+            v = fa[v][i];
+        }
+    }
+    return fa[u][0];
+}
+
+void solve(){
+    
+    int n, m, s;//树结点个数，询问次数， 根节点序号
+    cin >> n >> m >> s;
+    for(int i = 1; i < n; i++){
+        int a, b; cin >> a >> b;
+        add(a, b); add(b, a);
+    }
+    dfs(s, 0);
+    while(m--){
+        int u, v; cin >> u >> v;
+        int ans = lca(u, v);
+        cout << ans << endl;
+    }
+}
+
+int main(){
+    ios::sync_with_stdio(0); 
+    cin.tie(0); cout.tie(0);
+    int tt = 1 ;
+    while(tt--) solve() ;
+    return 0 ;
+}

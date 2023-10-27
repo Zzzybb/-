@@ -1,0 +1,93 @@
+//https://codeforces.com/gym/104053/problem/C
+
+#include<bits/stdc++.h>
+using namespace std;
+using ll = long long;
+#define endl '\n'
+#define MAXN 500005
+
+pair<int,int>e[MAXN];
+
+int fa[MAXN],to[MAXN];
+int find(int x)
+{
+    return x == fa[x] ? x : fa[x] = find(fa[x]);
+}
+void merge(int u,int v)
+{
+    u=find(u),v=find(v);
+    if(u!=v)fa[u]=v;
+}
+vector<int>G[MAXN];
+int col[MAXN],deg[MAXN],dis[MAXN],w[MAXN];
+int N,M;
+queue<int>q;
+bool topsort()
+{
+    while(!q.empty()) q.pop();
+    q.push(1);
+    while(!q.empty())
+    {
+        int u=q.front();q.pop();
+        for(auto v : G[u])
+        {
+            dis[v] =max(dis[v],dis[u]+1);
+            --deg[v];if(deg[v]==0)q.push(v);
+        }
+    }
+    for(int i =1;i<=N;i++)
+    {
+        if(deg[i])return false;
+    }
+    return true;
+}
+bool solve()
+{
+    cin >> N >> M;
+    for(int i =1;i<=N;i++)
+        deg[i]=0,fa[i]=i,to[i]=0,col[i]=0,G[i].clear();
+    for(int i=1;i<=M;i++)
+    {
+        cin >> e[i].first >> e[i].second;
+        if(to[e[i].second]==0)to[e[i].second]=e[i].first;
+        else merge(e[i].first,to[e[i].second]);
+    }
+    int tot=0;
+    for(int i=1;i<=N;i++)
+    {
+        int cur=find(i);
+        if(!col[cur])
+        {
+            col[cur]=++tot;dis[tot]=0;
+        }
+        col[i]=col[cur];
+    }
+    for(int i=1;i<=M;i++)
+    {
+        G[col[e[i].first]].push_back(col[e[i].second]);
+        ++deg[col[e[i].second]];
+    }
+    dis[1]=1;
+    if(!topsort())return false;
+    for(int i=1;i<=M;i++)
+    {
+        w[e[i].second]=dis[col[e[i].second]]-dis[col[e[i].first]];
+    }
+    w[1]=1;
+    cout <<"Yes"<<endl;
+    for(int i=1;i<N;i++)cout<<w[i]<<" ";
+    cout <<w[N]<<endl;
+    return true;
+}
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    int tt;
+    cin >> tt;
+    while(tt--)
+    {
+        if(!solve())cout<<"No"<<endl;
+    }
+    return 0;
+}

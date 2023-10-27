@@ -1,0 +1,49 @@
+//kruskal算法-边数较少 所有点画出 找最短的边依次填入 成环不填找个权值稍微大一点的边
+//使用并查集判断有没有成环
+#include<bits/stdc++.h>
+using namespace std;
+using ll = long long;
+const int N=100010,M=200010;
+int n,m;
+int fa[N];
+
+struct Edge{
+	int a,b,w;
+}edges[M];
+bool cmp(const Edge&x,const Edge&y){
+	return x.w<y.w;
+}
+int find(int x){
+	if(fa[x]!=x) fa[x]=find(x);
+	return fa[x];
+}
+int kruskal(){
+	sort(edges,edges+m,cmp);//给边权排序
+	for(int i=1;i<=n;i++)fa[i]=i;//初始化并查集
+	int res=0,cnt=0;//res表示最小生成树的边权值和，cnt表示最小生成树中的边数
+	for(int i=0;i<m;i++){//总共有m条边
+		int a=edges[i].a,b=edges[i].b,w=edges[i].w;
+		//利用并查集判断是否成环
+		a=find(a),b=find(b);//找到a和b所在的连通块
+		if(a!=b){//如果a和b不在同一个连通块中
+			fa[a]=b;//合并a和b所在的连通块
+			res+=w;//更新答案
+			cnt++;//更新边数
+		}
+	}
+	if(cnt<n-1)return -1;//如果边数小于n-1，则说明图不连通，返回-1
+	return res;//返回最小生成树的边权之和
+}
+int main()
+{
+	ios::sync_with_stdio(false);
+    cin.tie(0);
+	cin>>n>>m;
+	for(int i=0;i<m;i++){
+		int a,b,w;
+		cin>>a>>b>>w;
+		edges[i]={a,b,w};
+	}
+	cout<<kruskal()<<endl;
+	return 0;
+}

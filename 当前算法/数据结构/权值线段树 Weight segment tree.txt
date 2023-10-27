@@ -1,0 +1,139 @@
+#include<bits/stdc++.h>
+using namespace std;
+using ll = long long;
+#define ls(x) tree[x].ls
+#define rs(x) tree[x].rs
+#define val(x) tree[x].val
+#define mark(x) tree[x].mark
+const int MAXV = 8e6;
+int n, opt, x;
+int L = -1e7 - 5, R = 1e7 + 5, cnt = 1;
+struct node
+{
+    ll val, mark;
+    int ls, rs;
+} tree[MAXV];
+void upd(int &p, int d, int len)
+{
+    if(!p) p = ++cnt;
+    val(p) += d * len;
+    mark(p) += d;
+}
+void push_down(int p, int cl, int cr)
+{
+    if (cl >= cr) return;
+    int mid = (cl + cr - 1) / 2;
+    upd(ls(p), mark(p), mid - cl + 1);
+    upd(rs(p), mark(p), cr - mid);
+    mark(p) = 0;
+}
+void update(int l, int r, int d, int p = 1, int cl = L, int cr = R)
+{
+    if (cl >= l && cr <= r)
+    {
+        val(p) += d * (cr - cl + 1);
+        mark(p) += d;
+		return;
+    }
+    push_down(p, cl, cr);
+    int mid = (cl + cr - 1) / 2;
+    if (mid >= l) update(l, r, d, ls(p), cl, mid);
+    if (mid < r) update(l, r, d, rs(p), mid + 1, cr);
+    val(p) = val(ls(p)) + val(rs(p));
+}
+ll query(int l, int r, int p = 1, int cl = L, int cr = R)
+{
+    if (cl >= l && cr <= r) return val(p);
+    push_down(p, cl, cr);
+    ll mid = (cl + cr - 1) / 2, ans = 0;
+    if (mid >= l) ans += query(l, r, ls(p), cl, mid);
+    if (mid < r) ans += query(l, r, rs(p), mid + 1, cr);
+    return ans;
+}
+void insert(int v)
+{
+    update(v, v, 1);
+}
+void remove(int v)
+{
+    update(v, v, -1);
+}
+int count1(int v)//求比某数小的数的个数
+{
+    return query(L, v - 1);
+}
+int count2(int v)//丘比某数大的数的个数
+{
+    return query(v + 1, R);
+}
+int ranks(int v)//求某数的排名
+{
+    return count1(v) + 1;
+}
+int kth(int k, int p = 1, int cl = L, int cr = R)//求指定排名的数
+{
+    if (cl == cr)
+        return cl;
+    int mid = (cl + cr - 1) / 2;
+    if (val(ls(p)) >= k)
+        return kth(k, ls(p), cl, mid);
+    else 
+        return kth(k - val(ls(p)), rs(p), mid + 1, cr);
+}
+int pre(int v)
+{
+    int r = count1(v);
+    return kth(r);
+}
+int suc(int v)
+{
+    int r = val(1) - count2(v) + 1;
+    return kth(r);
+}
+
+
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    cin >> n; 
+    while(n--)
+    {
+        cin >> opt >> x;
+        switch(opt)
+        {
+            case 1 :
+                //cout << 1 << endl;
+                insert(x);
+                break;
+            case 2 :
+                //cout << 2 << endl;
+                remove(x);
+                break;
+            case 3 :
+                //cout << 3 << endl;
+                cout << ranks(x) << '\n';
+                break;
+            case 4 :
+                //cout << 4 << endl;
+                cout << kth(x) << '\n';
+                break;
+            case 5 :
+                //cout << 5 << endl;
+                cout << pre(x) << '\n';
+                break;
+            case 6 :
+                //cout << 6 << endl;
+                cout << suc(x) << '\n';
+                break;
+            default :
+                break;
+        }
+    }
+    return 0;
+}
+
+
+
+
+

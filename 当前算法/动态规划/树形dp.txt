@@ -1,0 +1,158 @@
+//p1352 没有上司的舞会
+
+#include<bits/stdc++.h>
+using namespace std;
+using ll = long long;
+#define IO ios::sync_with_stdio(false),cin.tie(0);
+#define endl '\n'
+#define MAXN 6005
+int v[MAXN];
+int f[MAXN][2];
+int h[MAXN];
+vector<int>son[MAXN];
+void dp(int x){
+	f[x][0]=0;
+	f[x][1]=h[x];
+	for(int i=0;i<son[x].size();i++){
+		int y=son[x][i];
+		dp(y);
+		f[x][0]+=max(f[y][0],f[y][1]);
+		f[x][1]+=f[y][0];
+	}
+}
+int main()
+{
+	IO
+	int n;
+	cin>>n;
+	for(int i=1;i<=n;i++)cin>>h[i];
+	for(int i=1;i<=n-1;i++){
+		int x,y;
+		cin>>x>>y;
+		son[y].push_back(x);
+		v[x]=1;
+	}
+	int root;
+	for(int i=1;i<=n;i++)
+	if(!v[i]){root=i;break;}
+	dp(root);
+	cout<<max(f[root][0],f[root][1])<<endl;
+	return 0;
+}
+
+
+//树形dp+背包dp P2014 选课
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+typedef long double lb;
+#define all(x) (x).begin(), (x).end()
+#define debug(x){cerr<<#x<<'='<<x<<endl;}
+#define endl '\n'
+const int MAXN = 300 + 5;
+vector<int>E[MAXN];
+int n,m;
+int dp[MAXN][MAXN];
+
+void dfs(int u)
+{
+    for(int i=0;i<E[u].size();i++)
+        dfs(E[u][i]);
+
+    for(int i=0;i<E[u].size();i++)
+        for(int j = m, v = E[u][i];j > 0;j --)
+            for(int k=0;k<j;k++)
+                dp[u][j]=max(dp[u][j],dp[u][j-k]+dp[v][k]);
+}
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    cin>>n>>m;
+    m++;
+    for(int i = 1; i <= n; i++)
+    {
+        int fa;
+        cin >> fa >> dp[i][1];
+        E[fa].push_back(i);
+    }
+    dfs(0);
+    cout << dp[0][m] << endl;
+    return 0;
+}
+
+
+
+//换根dp  POI2008
+//用两次DFS，第一次预处理诸如深度，点权和之类的信息，第二次DFS运行动态规划
+
+
+
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+typedef long double lb;
+#define all(x) (x).begin(), (x).end()
+#define debug(x){cerr<<#x<<'='<<x<<endl;}
+#define endl '\n'
+ll n,sz[1000010],f[1000010],dep[1000010];
+
+void dfs(int u, int fa, vector<vector<int>>& E)
+{   
+    sz[u] = 1;
+    dep[u] = dep[fa] + 1;
+    for(int i = 0; i < E[u].size();i++)
+    {   
+        int v = E[u][i];
+        if(v != fa)	
+        {
+            dfs(v,u,E);
+            sz[u] += sz[v];
+        }
+    }
+}
+
+void get_ans(int u, int fa,vector<vector<int>>& E)
+{
+    for(int i = 0; i < E[u].size(); i++)
+    {
+        int v = E[u][i];
+        if(v!=fa)
+        {
+            f[v] = f[u] - sz[v] * 2 + n;
+            get_ans(v,u,E);
+        }
+    }
+}
+
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    cin >> n;
+    vector<vector<int>>E(n+1);
+    for(int i = 1; i < n; i++)
+    {
+        int u, v;
+        cin >> u >> v;
+        E[u].push_back(v);
+        E[v].push_back(u);
+    }
+    dfs(1,1,E);
+    for(int i = 1; i <= n; i++) f[1] += dep[i];
+    get_ans(1,1,E);
+    ll ans = -1;
+    int id;
+    for(int i = 1; i <= n; i++)
+    {
+        if(f[i] > ans)
+        {
+            ans = f[i];
+            id = i;
+        }
+    }
+    cout << id << endl;
+    return 0;
+}

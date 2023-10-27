@@ -1,0 +1,62 @@
+//（König定理）一个二分图中的最大匹配数等于这个图中的最小点覆盖数。
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+typedef long double lb;
+#define all(x) (x).begin(), (x).end()
+#define debug(x){cerr<<#x<<'='<<x<<endl;}
+#define endl '\n'
+//cout<<fixed<<setprecision(5)<< x <<endl;
+const int MAXN = 600;
+int M, N, e;// M, N分别表示左右集合的元素数量
+vector<vector<int>> adj;//邻接表存图，复杂度会更低
+int p[MAXN];//记录当前右侧元素对应的左侧元素
+bool vis[MAXN];//记录右侧元素是否已经被访问过
+
+bool match(int i)
+{
+    for(int j : adj[i])
+    {
+        if(!vis[j])//有边且未访问
+        {
+            vis[j] = true;
+            if(p[j] == 0 || match(p[j]))//如果暂无匹配，或者原来匹配的左侧元素可以找到新的右侧元素
+            {
+                p[j] = i;
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+int Hungarain()
+{
+    int cnt = 0;
+    for(int i = 1; i <= M; i++)
+    {
+        memset(vis, 0, sizeof(vis));
+        if(match(i))
+            cnt++;
+    }
+    return cnt;
+}
+
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    cin >> M >> N >> e;
+    adj.resize(M + 1);
+
+    while(e--)
+    {
+        int u, v;
+        cin >> u >> v;
+        adj[u].push_back(v);
+    }
+    cout << Hungarain() << endl;
+
+    return 0;
+}

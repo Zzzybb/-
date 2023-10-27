@@ -1,0 +1,77 @@
+//cf24 D Broken robot
+//题目大意：给出一个 n * m 的矩阵区域，一个机器人初始在第 x 行第 y 列，每一步机器人会等概率地选择停在原地，左移一步，右移一步，下移一步，如果机器人在边界则不会往区域外移动，问机器人到达最后一行的期望步数。
+
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+typedef long double lb;
+#define all(x) (x).begin(), (x).end()
+#define debug(x){cerr<<#x<<'='<<x<<endl;}
+#define endl '\n'
+//cout<<fixed<<setprecision(5)<< x <<endl;
+const int MAXN = 1e3 + 7;
+double a[MAXN][MAXN], f[MAXN];
+int n, m;
+
+void solve()
+{
+    memset(a, 0, sizeof a);
+    for(int i = 1; i <= m; i ++)
+    {
+        if(i == 1)
+        {
+            a[i][i] = 2;
+            a[i][i + 1] = -1;
+            a[i][m + 1] = 3 + f[i];
+            continue;
+        }
+        else if(i == m)
+        {
+            a[i][i] = 2;
+            a[i][i - 1] = -1;
+            a[i][m + 1] = 3 + f[i];
+            continue;
+        }
+        a[i][i] = 3;
+        a[i][i - 1] = -1;
+        a[i][i + 1] = -1;
+        a[i][m + 1] = 4 + f[i];
+    }
+    //消元 化成最简式
+    for(int i = 1; i < m; i++)
+    {
+        double p = a[i + 1][i] / a[i][i];
+        a[i + 1][i] = 0;
+        a[i + 1][i + 1] -= a[i][i + 1] * p;
+        a[i + 1][m + 1] -= a[i][m + 1] * p;
+    }
+
+    f[m] = a[m][m + 1] / a[m][m];
+    for(int i = m - 1; i >= 1; i--)
+    {
+        f[i] = (a[i][m + 1] - f[i + 1] * a[i][i + 1]) / a[i][i];
+    }
+}
+
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    cin >> n >> m;
+    int st, ed;
+    cin >> st >> ed;
+    if(m == 1)
+    {
+        cout<<fixed<<setprecision(10)<< 2.0 * (n - st) <<endl;
+        return 0;
+    }
+    for(int i = n - 1; i >= st; i --)
+    {
+        solve();
+    }
+    cout<<fixed<<setprecision(10)<< f[ed] <<endl;
+        
+
+    return 0;
+}

@@ -1,0 +1,78 @@
+int Exgcd(int a, int b, int &x, int &y) {
+  if (!b) {
+    x = 1;
+    y = 0;
+    return a;
+  }
+  int d = Exgcd(b, a % b, x, y);
+  int t = x;
+  x = y;
+  y = t - (a / b) * y;
+  return d;
+}
+
+
+
+
+
+
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+typedef long double lb;
+#define all(x) (x).begin(), (x).end()
+#define debug(x){cerr<<#x<<'='<<x<<endl;}
+#define endl '\n'
+#define int long long
+//cout<<fixed<<setprecision(5)<< x <<endl;
+
+int gcd(int a,int b){
+	while(b!=0){
+		int tmp=a;
+		a=b;
+		b=tmp%b;
+	}
+	return a;
+}
+
+int Exgcd(int a, int b, int &x, int &y) {
+  if (!b) {
+    x = 1;
+    y = 0;
+    return a;
+  }
+  int d = Exgcd(b, a % b, x, y);
+  int t = x;
+  x = y;
+  y = t - (a / b) * y;
+  return d;
+}
+
+
+signed main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    int n, m,tmp,sum=0;
+    cin>>n>>m;
+    for(int i = 1; i <= n; i++)
+    {
+        cin >> tmp;
+        sum += tmp;
+    } 
+    int g1 = gcd(n,n*(n+1)/2);
+    int g2 = gcd(g1,m);
+    int ans = sum % g2;
+    int k1,k2;
+    Exgcd(g1,m,k1,k2);
+    k1 *=((ans-sum)/g2)%m;
+    k1 %=m;
+    int s,d;
+    Exgcd(n,n*(n+1)/2,s,d);
+    s*=k1,d*=k1;
+    cout << ans <<endl;
+    cout << (s%m+m)%m << ' ' << (d%m+m)%m << endl;
+
+    return 0;
+}

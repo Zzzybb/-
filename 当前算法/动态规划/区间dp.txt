@@ -1,0 +1,110 @@
+//石子合并
+#include<bits/stdc++.h>
+using namespace std;
+using ll = long long;
+#define inf 0x3f3f3f3f
+int main()
+{
+	ios::sync_with_stdio(false);
+	
+	//初始化
+	const int N=310;
+	int n;//石子堆数
+	int a[N];//记录每堆石子的质量
+	int s[N];//记录前缀和
+	int f1[N][N];//f1[l][r]表示把从l到r合并成一堆的最小代价
+	int f2[N][N];//f2[l][r]表示把从l到r合并成一堆的最大代价
+	cin>>n;
+	for(int i=1;i<=n;i++){
+		cin>>a[i];//每堆石子的质量
+		a[i+n]=a[i];
+	}
+	for(int i=1;i<=2*n;i++){
+		s[i]=s[i-1]+a[i];
+	}
+
+	//状态计算
+	for(int len=2;len<=n;len++)//阶段：枚举区间长度
+		for(int l=1;l+len-1<2*n;l++){//状态：枚举区间起点
+			int r=l+len-1;//区间终点
+			f1[l][r]=inf; f2[l][r]=-inf;//分别是最小最大
+			for(int k=l;k<r;k++){//决策：枚举分割点
+				f1[l][r]=min(f1[l][r],f1[l][k]+f1[k+1][r]+s[r]-s[l-1]);
+				f2[l][r]=max(f2[l][r],f2[l][k]+f2[k+1][r]+s[r]-s[l-1]);
+			}
+		}
+	int ans1=inf,ans2=-inf;//分别是最小值和最大值 
+	for(int i=1;i<=n;i++)
+	{
+		ans1=min(ans1,f1[i][i+n-1]);//刚好是一个环的元素和 
+		ans2=max(ans2,f2[i][i+n-1]);
+	}
+	cout<<ans1<<endl<<ans2<<endl;
+	return 0;
+}
+
+
+//P4767邮局
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+typedef long double lb;
+#define all(x) (x).begin(), (x).end()
+#define debug(x){cerr<<#x<<'='<<x<<endl;}
+#define endl '\n'
+const int MAXN = 3010;
+const int N = 310;
+int V,P,X[MAXN],dp[MAXN][N],w[MAXN][MAXN],d[MAXN][N];
+#define INF 0x3f3f3f3f
+
+// int w(int l,int r)
+// {
+//     int mid=l+r>>1,ans=0;
+//     for(int i=l;i<mid;i++)ans+=X[mid]-X[i];
+//     for(int i=mid+1;i<=r;i++)ans+=X[i]-X[mid];
+//     return ans;
+// }   
+void init()
+{
+    for(int l =1;l<=V;l++)
+    {
+        w[l][l]=0;
+        for(int r= l+1;r<=V;r++)
+        {
+            w[l][r]=w[l][r-1]+X[r]-X[l+r>>1];
+        }
+    }
+}
+
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    cin >> V >> P;
+    for(int i=1;i<=V;i++)cin>>X[i];
+    init();
+    sort(X+1,X+V+1);
+    memset(dp,0x3f,sizeof(dp));
+    dp[0][0]=0;
+    for(int j=1;j<=P;j++)
+    {
+        d[V+1][j]=V;
+        for(int i=V;i>=1;i--)
+        {
+            int minn=INF,minid;
+            for(int k=d[i][j-1];k<=d[i+1][j];k++)
+            {
+                if(dp[k][j-1]+w[k+1][i]<minn)
+                {
+                    minn =dp[k][j-1]+w[k+1][i];
+                    minid=k;
+                }
+            }
+            dp[i][j]=minn;
+            d[i][j]=minid;
+        }
+    }
+    cout << dp[V][P]<<endl;
+    return 0;
+}

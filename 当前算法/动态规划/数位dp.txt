@@ -1,0 +1,230 @@
+//模板
+#include<bits/stdc++.h>
+using namespace std;
+const int N = 15;
+int l, r, a[N], len, dp[N][N];
+int dfs(int pos, int pre, int lead, int limit) {
+    if (!pos) {
+        边界条件
+    }
+    if (!limit && !lead && dp[pos][pre] != -1) return dp[pos][pre];
+    int res = 0, up = limit ? a[pos] : 无限制位;
+    for (int i = 0; i <= up; i ++) {
+        if (不合法条件) continue;
+        res += dfs(pos - 1, 未定参数, lead && !i, limit && i == up);
+    }
+    return limit ? res : (lead ? res : dp[pos][sum] = res);
+}
+int cal(int x) {
+    memset(dp, -1, sizeof dp);
+    len = 0;
+    while (x) a[++ len] = x % 进制, x /= 进制;
+    return dfs(len, 未定参数, 1, 1);
+}
+signed main() {
+    cin >> l >> r;
+    cout << cal(r) - cal(l - 1) << endl;
+}
+
+
+// 不要62，4
+#include<bits/stdc++.h>
+using namespace std;
+const int N = 15;
+int l, r, dp[N][N], len, a[N];
+int dfs(int pos, int pre, int limit)
+{
+    if(!pos) return 1;
+    if(!limit && dp[pos][pre] != -1) return dp[pos][pre];
+    int res = 0, up = limit ? a[pos] : 9;
+    for(int i = 0; i <= up; i ++)
+    {
+        if(i == 4 || (i == 2 && pre == 6))continue;
+        res += dfs(pos - 1, i, limit && i == up);
+    }
+    return limit ? res : dp[pos][pre] = res;
+}
+
+int cal(int x)
+{
+    memset(dp, -1, sizeof dp);
+    len = 0;
+    while(x) a[++ len] = x % 10, x /= 10;
+    return dfs(len, 0, 1);
+}
+int main()
+{
+    while(cin >> l >> r, l || r)
+    {
+        cout << cal(r) - cal(l - 1) << endl;
+    }
+}
+
+
+// windy数找到区间 [L,R]相邻数字之差至少为2的数的个数
+#include<bits/stdc++.h>
+using namespace std;
+const int N = 15;
+int l, r, a[N], len, dp[N][N];
+int dfs(int pos, int pre, int lead, int limit) {
+    if (!pos) return 1;
+    if (!limit && !lead && dp[pos][pre] != -1) return dp[pos][pre];
+    int res = 0, up = limit ? a[pos] : 9;
+    for (int i = 0; i <= up; i ++) {
+        if (abs(pre - i) < 2) continue;
+        if(lead && !i)
+        {
+            res += dfs(pos - 1, -2, lead && !i, limit && i == up);
+        }
+        else 
+        {
+            res += dfs(pos - 1, i, lead && !i, limit && i == up);
+        }
+        
+    }
+    return limit ? res : (lead ? res : dp[pos][pre] = res);
+}
+int cal(int x) {
+    memset(dp, -1, sizeof dp);
+    len = 0;
+    while (x) a[++ len] = x % 10, x /= 10;
+    return dfs(len, -2, 1, 1);
+}
+signed main() {
+    cin >> l >> r;
+    cout << cal(r) - cal(l - 1) << endl;
+}
+
+
+// 数字游戏找到区间 [L,R]各位数字非严格单调递增的数的个数
+#include<bits/stdc++.h>
+using namespace std;
+const int N = 15;
+int l, r, a[N], len, dp[N][N];
+int dfs(int pos, int pre, int limit) {
+    if (!pos) return 1;
+    if (!limit && dp[pos][pre] != -1) return dp[pos][pre];
+    int res = 0, up = limit ? a[pos] : 9;
+    for (int i = 0; i <= up; i ++) {
+        if (i < pre) continue;
+        res += dfs(pos - 1, i, limit && i == up);
+    }
+    return limit ? res : dp[pos][pre] = res;
+}
+int cal(int x) {
+    memset(dp, -1, sizeof dp);
+    len = 0;
+    while (x) a[++ len] = x % 10, x /= 10;
+    return dfs(len, 0, 1);
+}
+signed main() {
+    while(cin >> l >> r)
+    cout << cal(r) - cal(l - 1) << endl;
+}
+
+
+// 数字游戏二 找到区间 [L,R]各位数字之和 mod n=0的数的个数
+
+#include<bits/stdc++.h>
+using namespace std;
+const int N = 1e3+5;
+int l, r, p, a[N], len, dp[N][N];
+int dfs(int pos, int sum, int limit) {
+    if (!pos) return sum % p == 0;
+    if (!limit && dp[pos][sum] != -1) return dp[pos][sum];
+    int res = 0, up = limit ? a[pos] : 9;
+    for (int i = 0; i <= up; i ++) {
+        res += dfs(pos - 1, sum + i, limit && i == up);
+    }
+    return limit ? res : dp[pos][sum] = res;
+}
+int cal(int x) {
+    memset(dp, -1, sizeof dp);
+    len = 0;
+    while (x) a[++ len] = x % 10, x /= 10;
+    return dfs(len, 0, 1);
+}
+signed main() {
+    while(cin >> l >> r >> p)
+        cout << cal(r) - cal(l - 1) << endl;
+}
+
+
+// 度的数量  找到区间[L,R]恰好为K个B的幂次方之和的数的个数 进制，每位必须是1
+
+#include<bits/stdc++.h>
+using namespace std;
+const int N = 35;
+int l, r, b, k, a[N], len, dp[N][N];
+int dfs(int pos, int cnt, int limit) {
+    if (!pos) return cnt == k;
+    if (!limit && dp[pos][cnt] != -1) return dp[pos][cnt];
+    int res = 0, up = limit ? a[pos] : b - 1;
+    for (int i = 0; i <= up; i ++) {
+        if ((i == 1 && cnt == k) || i > 1) continue;
+        res += dfs(pos - 1, cnt + (i == 1), limit && i == up);
+    }
+    return limit ? res : dp[pos][cnt] = res;
+}
+int cal(int x) {
+    memset(dp, -1, sizeof dp);
+    len = 0;
+    while (x) a[++ len] = x % b, x /= b;
+    return dfs(len, 0, 1);
+}
+signed main() {
+    cin >> l >> r >> k >> b;
+    cout << cal(r) - cal(l - 1) << endl;
+}
+
+
+//计数问题 统计区间[L,R]0123456789的各个数字总次数
+
+#include<bits/stdc++.h>
+using namespace std;
+const int N = 15;
+int l, r, a[N], len, dp[N][N];
+int dfs(int pos, int sum, int num, int lead, int limit) {
+    if (!pos) 
+    {
+        if (lead && !num) return 1;
+        return sum;
+    }
+    if (!limit && !lead && dp[pos][sum] != -1) return dp[pos][sum];
+    int res = 0, up = limit ? a[pos] : 9;
+    for (int i = 0; i <= up; i ++) {
+        int t;
+        if (i==num)
+        {
+            if (!num)
+            {
+                t = sum + (lead == 0);
+            }
+            else 
+            {
+                t = sum + 1;
+            }
+        }
+        else
+        {
+            t = sum;
+        }
+        res += dfs(pos - 1, t, num, lead && !i, limit && i == up);
+    }
+    return limit ? res : (lead ? res : dp[pos][sum] = res);
+}
+int cal(int x,int num) {
+    memset(dp, -1, sizeof dp);
+    len = 0;
+    while (x) a[++ len] = x % 10, x /= 10;
+    return dfs(len, 0, num, 1, 1);
+}
+signed main() {
+    while(cin >> l >> r , l || r)
+    {
+        if(l > r)swap(l,r);
+        for(int i = 0; i <= 9 ;i ++)
+        cout << cal(r,i) - cal(l - 1,i) << " ";
+        cout << endl;
+    }
+}

@@ -1,0 +1,29 @@
+//ST表-基于倍增的思想
+#include<bits/stdc++.h>
+using namespace std;
+using ll = long long;
+int main()
+{
+    int n,m;//n表示几个数字，m表示几个询问
+    int arr[100050];
+    scanf("%d %d",&n,&m);
+    vector<vector<int>>st(n+1,vector<int>(log2(n)+5,0));//st[i][j]表示从第i开始，长度为2^j个最大值，只要记住i是起点，2^j是长度就行
+    for(int i=1;i<=n;i++){
+        scanf("%d",&arr[i]);
+        st[i][0]=arr[i];
+    }   
+    //预处理阶段
+    for(int k=1;k<=log2(n);k++){//最大的长度也就是2^k
+        for(int i=1;i+(1<<k)-1<=n;i++){//保证不超数组长度,右端点小于等于n
+            st[i][k]=max(st[i][k-1],st[i+(1<<(k-1))][k-1]);
+        }
+    }
+    while(m--){
+        int l, r;
+        scanf("%d %d",&l,&r);
+        int k=log2(r-l+1);
+        int res=max(st[l][k],st[r-(1<<k)+1][k]);
+        printf("%d\n",res);
+    }
+    return 0;
+}

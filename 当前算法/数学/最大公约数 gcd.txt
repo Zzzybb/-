@@ -1,0 +1,70 @@
+//最大公约数即为 Greatest Common Divisor，常缩写为 gcd。
+//最小公倍数（Least Common Multiple, LCM），缩写lcm   gcd(a,b)*lcm(a,b)=a*b
+
+#include<bits/stdc++.h>
+using namespace std;
+using ll = long long;
+
+//辗转相除法||欧几里得算法
+//a<b时gcd(a,b)=gcd(b,a)
+//a>=b时，gcd(a,b)=gcd(b,a mod b)
+int gcd(int a,int b){
+	while(b!=0){
+		int tmp=a;
+		a=b;
+		b=tmp%b;
+	}
+	return a;
+}
+
+//更相减损术
+//大整数取模的时间复杂度较高，而加减法时间复杂度较低。
+//d|a、d|b 则d|(a-b)
+//a和b的公因数是a-b和b的公因数
+int gcd(int a, int b) {
+    while (a != b) {
+        if (a > b) {
+            a -= b;
+        } else {
+            b -= a;
+        }
+    }
+    return a;
+}
+
+//a>>b 时 stein算法优化
+//1如果 $a=0$ 或 $b=0$，则它们的最大公约数为 $max(a,b)$。
+//2如果 $a$ 和 $b$ 均为偶数，则 $gcd(a,b)=2\times gcd(a/2, b/2)$。
+//3如果 $a$ 是偶数，$b$ 是奇数，则 $gcd(a,b)=gcd(a/2, b)$。
+//4如果 $a$ 是奇数，$b$ 是偶数，则 $gcd(a,b)=gcd(a, b/2)$。
+//5如果 $a$ 和 $b$ 均为奇数，则令 $a'=|a-b|/2$，$b'=\min(a,b)$，则 $gcd(a,b)=gcd(a', b')$。
+int gcd(int a, int b) {
+    if (a == 0) return b;
+    if (b == 0) return a;
+
+    int k = 0;
+	//都是偶数
+    while ((a & 1) == 0 && (b & 1) == 0) {
+        ++k;
+        a >>= 1;
+        b >>= 1;
+    }
+	//a是偶数，b是奇数
+    while ((a & 1) == 0) a >>= 1;
+	//a是奇数，b是偶数
+    while ((b & 1) == 0) b >>= 1;
+	//a,b均为奇数，且不相等
+    while (a != b) {
+        if (a > b) swap(a, b);
+        b -= a;
+        do b >>= 1; while ((b & 1) == 0);
+    }
+
+    return a << k;
+}
+
+int main()
+{
+	ios::sync_with_stdio(false);
+	return 0;
+}
